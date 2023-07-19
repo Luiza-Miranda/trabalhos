@@ -1,0 +1,200 @@
+#
+# rede de celulas
+#
+#C=0 healthy
+#C=1 infected
+#C=2 dead
+#
+# rede dos virus
+#
+#V=0 sem virus
+#V=1,2,3,4,5,6,7
+#se V=8 volta para 0 e cria uma avalanche
+#
+# rede defesa
+#
+#D=0 ausente
+#D=1,2,3,..,z-1 nao detecta o virus
+#D=z detecta o virus
+#z=tempo para deteccao do virus
+#
+#
+L=100
+itmax=800
+prep=0.5
+R=5
+p=0.2
+q=0.4
+namos=100
+z=50
+m0=[]
+m1=[]
+m2=[]
+m3=[]
+m4=[]
+t=0
+while (t < itmax):
+  t=t+1
+  m0.append(0)
+  m1.append(0)
+  m2.append(0)
+  m3.append(0)
+  m4.append(0)
+
+import random
+
+ia=0
+while (ia < namos):
+  ia=ia+1
+# ========== Condicoes iniciais ==============
+  C=[]
+  V=[]
+  D=[]
+  x=0 #sitio1
+  while (x < L):
+    y=0
+    linhac=[]
+    linhav=[]
+    linhad=[]
+    while (y < L):
+      linhac.append(0)
+      linhav.append(0)
+      linhad.append(0)
+      y=y+1
+    C.append(linhac)
+    V.append(linhav)
+    D.append(linhad)
+    x=x+1
+  x=int(L*random.random())
+  y=int(L*random.random())
+  C[x][y]=1
+  V[x][y]=1
+# ========== Evolucao temporal  ==============
+  t=0
+  while (t < itmax):
+    x=0
+    while (x < L):
+      y=0
+      while (y < L):
+        if C[x][y]==2: #celulamorta
+          V[x][y]=0 #semvirus
+
+          if (random.random() < prep):# probabidade_de_se_reproduzir
+            C[x][y]=0 #celula_saudavel
+        if ((V[x][y] > 0) and (V[x][y] < 8)): #virus_em_estagio
+          V[x][y]=V[x][y]+1
+        if ((D[x][y] > 0) and (D[x][y] > z)): #celulaT_atuando
+          D[x][y]=D[x][y]+1
+        y=y+1
+      x=x+1
+    x=0
+    while (x < L): #enquantoxfor_menor_que_sitio
+      y=0
+      while (y < L): #enquanto_y_for_que_sitio
+        if V[x][y]==7: #ovirus_ta_no_penultimo_estagio
+          e=x+1 #direitadex
+          a=y+1 #direitadey
+          d=x-1 #esquerdadex
+          b=y-1 #esquerdadey
+          if (x+1)>=L:
+            e=0 #sechegarnabordaigualaazero
+          if (y+1)>=L:
+            a=0
+          if (x-1)<0:
+            d=L-1
+          if (y-1)<0:
+            b=L-1
+          if ((C[e][y] != 2) and (D[e][y] != z)):
+            if (V[e][y] < 7):
+              V[e][y]=V[e][y]+1
+          if ((C[d][y] != 2) and (D[d][y] != z)):
+            if (V[d][y] < 7):
+              V[d][y]=V[d][y]+1
+          if ((C[x][a] != 2) and (D[x][a] != z)):
+            if (V[x][a] < 7):
+              V[x][a]=V[x][a]+1
+          if ((C[x][b] != 2) and (D[x][b] != z)):
+            if (V[x][b] < 7):
+              V[x][b]=V[x][b]+1
+          if ((C[e][a] != 2) and (D[e][a] != z)):
+            if (V[e][a] < 7):
+              V[e][a]=V[e][a]+1
+          if ((C[d][a] != 2) and (D[d][a] != z)):
+            if (V[d][a] < 7):
+              V[d][a]=V[d][a]+1
+          if ((C[e][b] != 2) and (D[e][b] != z)):
+            if (V[e][b] < 7):
+              V[e][b]=V[e][b]+1
+          if ((C[d][b] != 2) and (D[d][b] != z)):
+            if (V[d][b] < 7):
+              V[d][b]=V[d][b]+1
+          V[x][y]=0
+          C[x][y]=2
+        y=y+1
+      x=x+1
+    x=0
+    while (x < L):
+      y=0
+      while (y < L):
+        if ((V[x][y] > 0) and (D[x][y] != z)):
+          C[x][y]=1
+        if (V[x][y] > 7):
+          C[x][y]=2
+        y=y+1
+      x=x+1
+    i0=0
+    i1=0
+    i2=0
+    i3=0
+    x=0
+    while (x < L):
+      y=0
+      while (y < L):
+         if C[x][y]==0:
+           i0=i0+1
+         elif C[x][y]==1:
+           i1=i1+1
+         elif C[x][y]==2:
+           i2=i2+1
+
+ #        if V[x][y]!=0:
+ #          i3=i3+2**(V[x][y]-1)
+
+         y=y+1
+      x=x+1
+    m0[t]=m0[t]+1.0*i0/(1.0*L*L)
+    m1[t]=m1[t]+1.0*i1/(1.0*L*L)
+    m2[t]=m2[t]+1.0*i2/(1.0*L*L)
+
+ #   m3[t]=m3[t]+1.0*i3/(1.0*L*L)
+
+    id1=0
+    x=0
+    while (x < L):
+      y=0
+      while (y < L):
+        if (D[x][y] > 0):
+          id1=id1+1
+        if ((C[x][y] == 1) and (D[x][y] == 0)):
+          pt=1.0*i1/(1.0*L*L)
+          if (random.random() < (0.1*pt)):
+            D[x][y]=1
+            id1=id1+1
+        y=y+1
+      x=x+1
+    m4[t]=m4[t]+1.0*id1/(1.0*L*L)
+    t=t+1
+
+arquivo = open("saida.txt", "w")
+arquivo.close()
+arquivo = open("saida.txt", "w")
+t=0
+while (t < itmax):
+  r0=str(m0[t]/namos)
+  r1=str(m1[t]/namos)
+  r2=str(m2[t]/namos)
+ # r3=str(m3[t]/namos)
+  r4=str(m4[t]/namos)
+  arquivo.write(r0+' '+r1+' '+r2+' '+r4+'\n ')
+  t=t+1
+arquivo.close()
