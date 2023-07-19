@@ -1,0 +1,21 @@
+import matplotlib.pyplot as plt
+y1, y2, y3, y4 = [], [], [], []
+x=[]
+for i in range(800):
+  x.append(i)
+ #print(x)
+for line in open ('saida.txt','r'):
+    val = [float(s) for s in line.split()]
+    y1.append(val[0])
+    y2.append(val[1])
+    y3.append(val[2])
+    y4.append(val[3])
+plt.plot(x, y1,label='Saudável')
+plt.plot(x, y2, label='Infectada')
+plt.plot(x, y3,label='Morta')
+plt.plot(x, y4, label='T')
+plt.xlabel('t')
+plt.ylabel('Densidade de células')
+plt.legend()
+plt.savefig('grafico2000z=1000p02.svg', dpi=400, transparent=True)
+plt.show()
